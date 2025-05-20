@@ -40,7 +40,7 @@ pipeline {
             steps {
                 script{
                  sh """
-                    echo "Hello, this is test"
+                    echo "Hello, this is test practice"
                  """
                 }
             }
