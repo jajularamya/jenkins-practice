@@ -1,9 +1,9 @@
 pipeline {
-    agent { label 'agent-1' }
+    agent { label 'AGENT-1' }
     environment { 
         PROJECT = 'EXPENSE'
         COMPONENT = 'BACKEND' 
-       
+        DEPLOY_TO = "production"
     }
     options {
         disableConcurrentBuilds()
@@ -36,33 +36,58 @@ pipeline {
                }
             }
         }
-        stage('build') {
+        stage('Test') {
             steps {
                 script{
                  sh """
-                    echo "hello this is build"
-                    echo "project: $PROJECT"
-                    sleep 15
-                 """
-                }
-                
-            }
-        }
-        stage('test') {
-            steps {
-                script{
-                 sh """
-                    echo "hello this is test"
+                    echo "Hello, this is test"
                  """
                 }
             }
         }
-        stage('deploy') {
+        stage('Deploy') {
+            /* input {
+                message "Should we continue?"
+                ok "Yes, we should."
+                submitter "alice,bob"
+                parameters {
+                    string(name: 'PERSON', defaultValue: 'Mr Jenkins', description: 'Who should I say hello to?')
+                }
+            } */
+            when { 
+                environment name: 'DEPLOY_TO', value: 'production'
+            }
             steps {
                 script{
                  sh """
-                    echo "hello this is deploy"
+                    echo "Hello, this is deploy"
                  """
+                }
+            }
+        }
+        stage('Parallel Stages') {
+            parallel {
+                stage('STAGE-1') {
+                    
+                    steps {
+                        script{
+                            sh """
+                                echo "Hello, this is STAGE-1"
+                                sleep 15
+                            """
+                        }
+                    }
+                }
+                stage('STAGE-2') {
+                    
+                    steps {
+                        script{
+                            sh """
+                                echo "Hello, this is STAGE-2"
+                                sleep 15
+                            """
+                        }
+                    }
                 }
             }
         }
@@ -70,6 +95,7 @@ pipeline {
     post { 
         always { 
             echo 'I will always say Hello again!'
+            deleteDir()
         }
         failure { 
             echo 'I will run when pipeline is failed'
@@ -78,8 +104,4 @@ pipeline {
             echo 'I will run when pipeline is success'
         }
     }
-
-
 }
-
-
